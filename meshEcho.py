@@ -15,6 +15,7 @@ import meshtastic.serial_interface
 import paho.mqtt.client as mqtt
 
 from config_check import ConfigCheck
+from subscriber import CmdSubscriber
 from subscriber import MqttSubscriber
 
 
@@ -40,11 +41,15 @@ def load_config() -> dict:
 
 
 def get_mqtt_client(config: dict, logger: Logger) -> Optional[mqtt.Client]:
-    config_check = ConfigCheck("mqtt", required=["username", "password", "host"])
-    mqtt_config = config_check.validate_config(config, logger)
+    mqtt_config = ConfigCheck(
+        config,
+        "mqtt",
+        ["username", "password", "host"],
+        logger
+    )
+    # mqtt_config = config_check.validate_config(config, logger)
 
-    if mqtt_config.get("enabled", False):
-        pass
+    if mqtt_config.get("enabled", False, bool):
 
         logger.info("setting up mqtt client")
 
@@ -56,8 +61,8 @@ def get_mqtt_client(config: dict, logger: Logger) -> Optional[mqtt.Client]:
         try:
             mqtt_client.connect(
                 host=mqtt_config["host"],
-                port=mqtt_config.get("port", 1883),
-                keepalive=mqtt_config.get("keepalive", 60)
+                port=mqtt_config.get("port", 1883, int),
+                keepalive=mqtt_config.get("keepalive", 60, int)
             )
             mqtt_client.loop_start()
         except ConnectionRefusedError:
@@ -83,8 +88,7 @@ def get_mqtt_client(config: dict, logger: Logger) -> Optional[mqtt.Client]:
 
 
 def connect_to_node(config: dict, logger: Logger):
-    config_check = ConfigCheck("meshtastic", required=["port"])
-    mesh_config = config_check.validate_config(config, logger)
+    mesh_config = ConfigCheck(config, "meshtastic", ["port"], logger)
     port = mesh_config["port"]
 
     exit_flag = False
@@ -141,6 +145,9 @@ def main():
 
     mqtt_sub = MqttSubscriber(config, mqtt_client)
     mqtt_sub.pubsub_subscribe()
+
+    cmd_sub = CmdSubscriber(config)
+    cmd_sub.pubsub_subscribe()
 
     connect_to_node(config, logger)
 

@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 from meshtastic.stream_interface import StreamInterface
 
 from config_check import ConfigCheck
-from .base_subscriber import BaseSubscriber
+from .base import BaseSubscriber
 
 
 class MqttSubscriber(BaseSubscriber):
@@ -19,10 +19,8 @@ class MqttSubscriber(BaseSubscriber):
         else:
             self._mqtt_client = mqtt_client
 
-        config_check = ConfigCheck("MqttSubscriber", required=["node_ids"])
-        sub_config = config_check.validate_config(config, self.logger)
-
-        self._node_ids = [id_.lower() for id_ in sub_config["node_ids"]]
+        mqtt_config = ConfigCheck(config, self.__class__.__name__, ["node_ids"], self.logger)
+        self._node_ids = [id_.lower() for id_ in mqtt_config["node_ids"]]
 
     @property
     def node_ids(self):

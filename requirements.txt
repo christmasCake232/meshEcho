@@ -1,1 +1,6 @@
+meshtastic
 paho-mqtt
+peewee
+protobuf
+psutil
+pubsub
