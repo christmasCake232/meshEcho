@@ -1,2 +1,2 @@
-from .cmd_subscriber import CmdSubscriber
-from .mqtt_subscriber import MqttSubscriber
+from .cmd import CmdSubscriber
+from .mqtt import MqttSubscriber

@@ -1,5 +1,6 @@
 import subprocess
 import time
+from datetime import timedelta
 
 import psutil
 from meshtastic.stream_interface import StreamInterface
@@ -16,22 +17,39 @@ class TopCmd(BaseCmd):
     def help_line(self, escape: str) -> str:
         return f"{super().help_line(escape)}: reports host status"
 
-    @staticmethod
-    def host_uptime():
+    def host_uptime(self):
         uptime = time.time() - psutil.boot_time()
-        return f"{uptime}s"
-        # return FormatUtils.format_td(uptime)
+        return self.format_time_delta(timedelta(seconds=uptime))
 
     @staticmethod
     def get_rpi_status():
         try:
             result = subprocess.run(["vcgencmd", "get_throttled"], stdout=subprocess.PIPE)
             # https://www.raspberrypi.com/documentation/computers/os.html#get_throttled
-            return result.stdout.decode()
-        except FileNotFoundError:
-            pass
+            throttled = int(result.stdout.decode().strip().split("=")[-1], 0)
+            status = []
+            if (1 << 0) & throttled != 0:
+                status.append("Undervoltage detected")
+            if (1 << 1) & throttled != 0:
+                status.append("Arm frequency capped")
+            if (1 << 2) & throttled != 0:
+                status.append("Currently throttled")
+            if (1 << 3) & throttled != 0:
+                status.append("Soft temperature limit active")
+            if (1 << 16) & throttled != 0:
+                status.append("Undervoltage has occurred")
+            if (1 << 17) & throttled != 0:
+                status.append("Arm frequency capping has occurred")
+            if (1 << 18) & throttled != 0:
+                status.append("Throttling has occurred")
+            if (1 << 19) & throttled != 0:
+                status.append("Soft temperature limit has occurred")
 
-        return "not found"
+            if status:
+                return ",".join(status)
+
+        except FileNotFoundError:
+            return None
 
     def __call__(self, escape: str, packet: dict, interface: StreamInterface):
         buf = []
