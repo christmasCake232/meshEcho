@@ -2,6 +2,7 @@
 
 import logging
 import os.path
+import re
 import time
 import tomllib
 from argparse import ArgumentParser
@@ -11,6 +12,7 @@ from sys import exit
 from typing import Optional
 
 import paho.mqtt.client as mqtt
+from meshtastic.ble_interface import BLEInterface
 from meshtastic.serial_interface import SerialInterface
 
 from config_check import ConfigCheck
@@ -86,6 +88,19 @@ def get_mqtt_client(config: dict, logger: Logger) -> Optional[mqtt.Client]:
         return None
 
 
+def get_interface(port: str, logger: Logger):
+    if os.path.isfile(port):
+        logger.info("port looks like a path, trying SerialInterface")
+        return SerialInterface(devPath=port)
+
+    if re.match(r"^([0-9A-F]{2}:){5}([0-9A-F]{2})$", port):
+        logger.info("port looks like a MAC address, trying BLEInterface")
+        return BLEInterface(address=port)
+
+    logger.error(f"unsupported interface: {port}")
+    raise NotImplementedError(f"unsupported interface: {port}")
+
+
 def connect_to_node(config: dict, logger: Logger):
     mesh_config = ConfigCheck(config, "meshtastic", ["port"], logger)
     port = mesh_config["port"]
@@ -94,7 +109,7 @@ def connect_to_node(config: dict, logger: Logger):
     while not exit_flag:
         logger.info(f"trying to connect to {port}...")
         try:
-            iface = SerialInterface(devPath=port)
+            iface = get_interface(port, logger)
             logger.info(f"connected to {port}")
 
             logger.info(f"{iface.getShortName()} {iface.getLongName()}")
