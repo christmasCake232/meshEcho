@@ -1,5 +1,11 @@
 # meshEcho
 
+general purpose meshtastic bot
+
+## Features
+- [text based commands](cmd/README.md)
+- [home assistant integrations via mqtt](subscriber/README.md)
+
 ## Instructions
 
 - Run `mqtt_installer.py` to install the home assistant mqtt discovery topics

@@ -10,9 +10,8 @@ from logging import Logger
 from sys import exit
 from typing import Optional
 
-import meshtastic
-import meshtastic.serial_interface
 import paho.mqtt.client as mqtt
+from meshtastic.serial_interface import SerialInterface
 
 from config_check import ConfigCheck
 from subscriber import CmdSubscriber
@@ -95,7 +94,7 @@ def connect_to_node(config: dict, logger: Logger):
     while not exit_flag:
         logger.info(f"trying to connect to {port}...")
         try:
-            iface = meshtastic.serial_interface.SerialInterface(devPath=port)
+            iface = SerialInterface(devPath=port)
             logger.info(f"connected to {port}")
 
             logger.info(f"{iface.getShortName()} {iface.getLongName()}")

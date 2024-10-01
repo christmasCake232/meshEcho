@@ -1,6 +1,5 @@
 import logging
 from logging import Logger
-from sys import exit
 
 
 class ConfigCheck:
