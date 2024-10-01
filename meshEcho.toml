@@ -5,10 +5,20 @@ port = "/dev/serial/by-id/usb-RAKwireless_WisCore_RAK4631_Board_69B609BA5A2C4EC7
 # mqtt client
 username = "mqttUser"
 password = "password"
-host = "127.0.0.q"
+host = "127.0.0.1"
 port = 1883
 keepalive = 60
 enabled = true
 
 [MqttSubscriber]
 node_ids = ["!dd1bf4f8"]
+
+[CmdSubscriber]
+escape = "@"
+
+[EchoCmd]
+[NoaaCmd]
+[RollCmd]
+[TopCmd]
+[ManCmd]
+[PingCmd]
