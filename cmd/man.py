@@ -1,7 +1,7 @@
 import re
 from typing import List
 
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 
 from .base import BaseCmd
 
@@ -19,7 +19,7 @@ class ManCmd(BaseCmd):
         cmds = " ".join(sorted(self._cmd_mapping.keys()))
         return f"{super().help_line(escape)}: list available cmd: {cmds}"
 
-    def __call__(self, escape: str, packet: dict, interface: StreamInterface):
+    def __call__(self, escape: str, packet: dict, interface: MeshInterface):
         text = self.get_text(packet)
 
         man_text = None

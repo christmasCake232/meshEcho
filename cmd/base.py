@@ -4,7 +4,7 @@ from logging import Logger
 from typing import List
 
 from meshtastic import BROADCAST_NUM
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 
 from config_check import ConfigCheck
 from interface_utils import get_long_name
@@ -42,7 +42,7 @@ class BaseCmd:
         else:
             return False
 
-    def __call__(self, escape: str, packet: dict, interface: StreamInterface):
+    def __call__(self, escape: str, packet: dict, interface: MeshInterface):
         raise NotImplementedError()
 
     @property
@@ -57,30 +57,30 @@ class BaseCmd:
         return f"{escape}{self.key}"
 
     @staticmethod
-    def is_packet_dm(packet: dict, interface: StreamInterface) -> bool:
+    def is_packet_dm(packet: dict, interface: MeshInterface) -> bool:
         return packet["to"] == interface.localNode.nodeNum
 
     @staticmethod
-    def send_reply_dm(replies: List[str], packet: dict, interface: StreamInterface):
+    def send_reply_dm(replies: List[str], packet: dict, interface: MeshInterface):
         from_id = packet["fromId"]
         for reply in replies:
             interface.sendText(reply, destinationId=from_id, wantAck=False)
 
     @staticmethod
-    def send_reply_channel(replies: List[str], packet: dict, interface: StreamInterface):
+    def send_reply_channel(replies: List[str], packet: dict, interface: MeshInterface):
         channel_index = packet.get("channel", 0)
 
         for reply in replies:
             interface.sendText(
                 reply, channelIndex=channel_index, destinationId=BROADCAST_NUM, wantAck=False)
 
-    def log_reply(self, replies: List[str], packet: dict, interface: StreamInterface):
+    def log_reply(self, replies: List[str], packet: dict, interface: MeshInterface):
         from_id = packet["fromId"]
         name = get_long_name(interface, from_id)
         reply = " ".join(" ".join(r.split()) for r in replies)
         self.logger.info(f"from {name}: '{self.get_text(packet)}' -> '{reply}'")
 
-    def send_reply(self, replies: List[str], packet: dict, interface: StreamInterface):
+    def send_reply(self, replies: List[str], packet: dict, interface: MeshInterface):
 
         if self.is_packet_dm(packet=packet, interface=interface):
             self.send_reply_dm(
@@ -97,14 +97,14 @@ class BaseCmd:
 
         self.log_reply(replies, packet, interface)
 
-    def apply_channel_prefix(self, packet: dict, interface: StreamInterface, text: str) -> str:
+    def apply_channel_prefix(self, packet: dict, interface: MeshInterface, text: str) -> str:
         if self.is_packet_dm(packet, interface):
             return text
 
         else:
             return f"{self.reply_prefix(packet, interface)}\n{text}"
 
-    def reply_prefix(self, packet: dict, interface: StreamInterface) -> str:
+    def reply_prefix(self, packet: dict, interface: MeshInterface) -> str:
         name = get_short_name(interface, packet["fromId"])
         return f"{self.key}({name})"
 

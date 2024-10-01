@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 
 from .base import BaseCmd
 
@@ -14,8 +14,7 @@ class PingCmd(BaseCmd):
     def help_line(self, escape: str) -> str:
         return f"{super().help_line(escape)}: reports packet received time"
 
-    def __call__(self, escape: str, packet: dict, interface: StreamInterface):
-        print(sorted(packet.keys()))
+    def __call__(self, escape: str, packet: dict, interface: MeshInterface):
         now = datetime.now()
         buf = ["pong"]
 

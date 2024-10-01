@@ -3,7 +3,7 @@ import time
 from datetime import timedelta
 
 import psutil
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 
 from .base import BaseCmd
 
@@ -51,7 +51,7 @@ class TopCmd(BaseCmd):
         except FileNotFoundError:
             return None
 
-    def __call__(self, escape: str, packet: dict, interface: StreamInterface):
+    def __call__(self, escape: str, packet: dict, interface: MeshInterface):
         buf = []
         if not self.is_packet_dm(packet, interface):
             buf.append(self.reply_prefix(packet, interface))

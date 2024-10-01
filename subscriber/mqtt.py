@@ -2,7 +2,7 @@ import json
 import sys
 
 import paho.mqtt.client as mqtt
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 
 from config_check import ConfigCheck
 from .base import BaseSubscriber
@@ -26,7 +26,7 @@ class MqttSubscriber(BaseSubscriber):
     def node_ids(self):
         return self._node_ids.copy()
 
-    def _telemetry(self, packet: dict, interface: StreamInterface):
+    def _telemetry(self, packet: dict, interface: MeshInterface):
 
         telemetry = self.dict_get(packet, ["decoded", "telemetry"])
         if telemetry:
@@ -79,7 +79,7 @@ class MqttSubscriber(BaseSubscriber):
         meter -= 1.848088 * (precision_bits ** 5)
         return meter
 
-    def _position(self, packet: dict, interface: StreamInterface):
+    def _position(self, packet: dict, interface: MeshInterface):
         # https://www.home-assistant.io/integrations/device_tracker.mqtt/
         from_id = f'{packet["from"]:x}'
         long_name = self.get_long_name(packet["fromId"], interface)
@@ -98,10 +98,10 @@ class MqttSubscriber(BaseSubscriber):
             self._mqtt_client.publish(state_topic, json.dumps(payload, sort_keys=True))
 
     @staticmethod
-    def get_long_name(from_id: str, interface: StreamInterface):
+    def get_long_name(from_id: str, interface: MeshInterface):
         return interface.nodes.get(from_id, {}).get("user", {}).get("longName", from_id)
 
-    def __call__(self, packet: dict, interface: StreamInterface):
+    def __call__(self, packet: dict, interface: MeshInterface):
 
         from_id = packet["fromId"]
 

@@ -3,7 +3,7 @@ from typing import Optional
 from urllib.parse import urlunsplit, urlencode
 from urllib.request import urlopen
 
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 
 from .base import BaseCmd
 
@@ -34,7 +34,7 @@ class NoaaCmd(BaseCmd):
             yield headline, description
 
     @staticmethod
-    def _get_position(interface: StreamInterface, node_id: str) -> Optional[dict]:
+    def _get_position(interface: MeshInterface, node_id: str) -> Optional[dict]:
         keys = {"latitude", "longitude"}
         position = interface.nodes.get(node_id, {}).get("position", None)
         if position and all(k in position for k in keys):
@@ -42,7 +42,7 @@ class NoaaCmd(BaseCmd):
 
         return None
 
-    def __call__(self, escape: str, packet: dict, interface: StreamInterface):
+    def __call__(self, escape: str, packet: dict, interface: MeshInterface):
         from_id = packet["fromId"]
 
         replies = []

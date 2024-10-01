@@ -1,6 +1,6 @@
 import re
 
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 
 from cmd import EchoCmd
 from cmd import ManCmd
@@ -67,7 +67,7 @@ class CmdSubscriber(BaseSubscriber):
     def escape(self) -> str:
         return self._escape
 
-    def __call__(self, packet: dict, interface: StreamInterface):
+    def __call__(self, packet: dict, interface: MeshInterface):
         from_id = packet["fromId"]
         from_name = get_long_name(interface, from_id)
         text = packet["decoded"]["text"]

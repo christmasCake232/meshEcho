@@ -2,7 +2,7 @@ import logging
 from logging import Logger
 from typing import List
 
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 from pubsub import pub
 
 
@@ -12,7 +12,7 @@ class BaseSubscriber:
         self._default_topic = default_topic
         self._logger = logger or logging.getLogger(self.__class__.__name__)
 
-    def __call__(self, packet: dict, interface: StreamInterface):
+    def __call__(self, packet: dict, interface: MeshInterface):
         raise NotImplementedError()
 
     def pubsub_subscribe(self, topic: str = None):

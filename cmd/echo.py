@@ -1,4 +1,4 @@
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 
 from interface_utils import get_long_name
 from .base import BaseCmd
@@ -18,7 +18,7 @@ class EchoCmd(BaseCmd):
     def _sanitize_text(text: str) -> str:
         return " ".join(text.split())
 
-    def __call__(self, escape: str, packet: dict, interface: StreamInterface):
+    def __call__(self, escape: str, packet: dict, interface: MeshInterface):
         text = self.get_text(packet).strip().lstrip(f"{escape}{self.key}").strip()
         if text:
             text = self.apply_channel_prefix(packet, interface, text)

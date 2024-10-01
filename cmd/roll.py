@@ -4,7 +4,7 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
-from meshtastic.stream_interface import StreamInterface
+from meshtastic.mesh_interface import MeshInterface
 
 from .base import BaseCmd
 
@@ -53,7 +53,7 @@ class RollCmd(BaseCmd):
 
             return None, None, []
 
-    def __call__(self, escape: str, packet: dict, interface: StreamInterface):
+    def __call__(self, escape: str, packet: dict, interface: MeshInterface):
 
         text = "".join(self.get_text(packet).lstrip(escape).split())
         count, upper_range, numbers = self.get_numbers(text)
